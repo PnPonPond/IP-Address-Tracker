@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import icon from "leaflet/dist/images/marker-icon.png";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import L from "leaflet";
-import { ChangeView } from "./ChangeView";
+import { useMap } from "react-leaflet";
+import iconL from "./icon-location.svg";
 
 const Container = styled.div`
   height: 100vh;
@@ -101,45 +101,56 @@ const TabInfo = styled.h2``;
 function Map() {
   const [ip, setip] = useState("8.8.8.8");
   const [location, setLocation] = useState(null);
-  const [lat, setLat] = useState(null);
-  const [lng, setLng] = useState(null);
-  const [get, setGet] = useState(false);
+  const [lat, setLat] = useState(50.5);
+  const [lng, setLng] = useState(30.5);
 
   let DefaultIcon = L.icon({
-    iconUrl: icon,
+    iconUrl: iconL,
     shadowUrl: iconShadow,
   });
   L.Marker.prototype.options.icon = DefaultIcon;
 
-  const Fetch = useCallback(() => {
+  const Fetch = () => {
     fetch(
       `https://geo.ipify.org/api/v2/country,city?apiKey=at_hA9vw0XpQnaeDUXbahaxDW3XHl62V&ipAddress=${ip}`
     )
       .then((res) => res.json())
-      .then(
-        (result) => {
-          if (result) {
-            setLocation(result);
-            setLat(result.location.lat);
-            setLng(result.location.lng);
-            setGet(true);
-            console.log(lat, lng);
-          }
-        },
-        (error) => {
-          alert(error);
-        }
-      );
-  }, [ip, lat, lng]);
+      .then((data) => {
+        setLocation(data);
+        setLat(data.location.lat);
+        setLng(data.location.lng);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
 
   useEffect(() => {
-    Fetch();
-  }, [Fetch]);
+    fetch(
+      `https://geo.ipify.org/api/v2/country,city?apiKey=at_hA9vw0XpQnaeDUXbahaxDW3XHl62V&ipAddress=${ip}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setLocation(data);
+        setLat(data.location.lat);
+        setLng(data.location.lng);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, [ip]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    Fetch(ip);
+    Fetch();
   };
+
+  function ChangeView(position) {
+    const map = useMap();
+    map.setView([lat, lng], 13);
+    return null;
+  }
 
   return (
     <Container>
@@ -190,20 +201,12 @@ function Map() {
           scrollWheelZoom={false}
           style={{ height: " 65vh", zIndex: "1" }}
         >
-          <ChangeView position={[lat, lng]} />
+          <ChangeView />
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {lat && lng && (
-            <Marker position={[lat, lng]}>
-              <Popup keepInView>
-                <span>
-                  A pretty CSS3 popup. <br /> Easily customizable.
-                </span>
-              </Popup>
-            </Marker>
-          )}
+          <Marker position={[lat, lng]}></Marker>
         </MapContainer>
       )}
     </Container>
