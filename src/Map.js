@@ -11,6 +11,7 @@ const Container = styled.div`
   height: 100vh;
   background-color: gray;
   position: relative;
+  overflow: hidden;
 `;
 
 const SectionTop = styled.div`
@@ -20,16 +21,25 @@ const SectionTop = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  @media (max-width: 425px) {
+    height: 45%;
+  }
 `;
 
 const Title = styled.h1`
   color: white;
+  @media (max-width: 425px) {
+    margin-top: -40px;
+  }
 `;
 
 const InputBox = styled.form`
   border-color: transparent;
   display: flex;
   margin-bottom: 100px;
+  @media (max-width: 425px) {
+    width: 80%;
+  }
 `;
 
 const Input = styled.input`
@@ -59,6 +69,9 @@ const Btn = styled.button`
   :hover {
     background-color: #292929;
   }
+  @media (max-width: 425px) {
+    width: 45%;
+  }
 `;
 
 const SectionMap = styled.div`
@@ -69,7 +82,6 @@ const SectionMap = styled.div`
 `;
 
 const Card = styled.div`
-  width: 80%;
   width: fit-content;
   border-radius: 15px;
   display: flex;
@@ -78,15 +90,25 @@ const Card = styled.div`
   background-color: white;
   position: absolute;
   z-index: 2;
+  @media (max-width: 425px) {
+    flex-direction: column;
+  }
 `;
 
 const CardTab = styled.div`
   padding: 20px;
+  @media (max-width: 425px) {
+    padding: 15px 30px;
+  }
 `;
 
 const TabTitle = styled.h5`
   color: gray;
   text-transform: uppercase;
+  @media (max-width: 425px) {
+    text-align: center;
+    margin: 0;
+  }
 `;
 
 const CardLine = styled.div`
@@ -94,9 +116,20 @@ const CardLine = styled.div`
   height: 80px;
   background-color: gray;
   opacity: 0.3;
+  @media (max-width: 425px) {
+    height: 0%;
+  }
 `;
 
-const TabInfo = styled.h2``;
+const TabInfo = styled.h2`
+  @media (max-width: 425px) {
+    font-size: 25px;
+    margin: 0;
+  }
+`;
+
+const api =
+  "https://geo.ipify.org/api/v2/country,city?apiKey=at_5Fmq9KsmFFpUwAZ2blWp3S0bK46A2&ipAddress=";
 
 function Map() {
   const [ip, setip] = useState("8.8.8.8");
@@ -111,9 +144,7 @@ function Map() {
   L.Marker.prototype.options.icon = DefaultIcon;
 
   const Fetch = () => {
-    fetch(
-      `https://geo.ipify.org/api/v2/country,city?apiKey=at_hA9vw0XpQnaeDUXbahaxDW3XHl62V&ipAddress=${ip}`
-    )
+    fetch(`${api}${ip}`)
       .then((res) => res.json())
       .then((data) => {
         setLocation(data);
@@ -126,9 +157,7 @@ function Map() {
   };
 
   useEffect(() => {
-    fetch(
-      `https://geo.ipify.org/api/v2/country,city?apiKey=at_hA9vw0XpQnaeDUXbahaxDW3XHl62V&ipAddress=${ip}`
-    )
+    fetch(`${api}${ip}`)
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -199,7 +228,7 @@ function Map() {
           center={[lat, lng]}
           zoom={13}
           scrollWheelZoom={false}
-          style={{ height: " 65vh", zIndex: "1" }}
+          style={{ height: "65vh", zIndex: "1" }}
         >
           <ChangeView />
           <TileLayer
